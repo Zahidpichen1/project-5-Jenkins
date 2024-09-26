@@ -14,14 +14,14 @@ pipeline {
             }
         }
 
-        // stages 2 : Set up the python environment
+        // Stage 2 : Set up the python environment
         stage('setup Environment'){
             steps{
                 echo 'Setting up python virtual environment...'
-                sh'''
-                   python3 -m venv ${PYTHON_ENV}
-                   source ${PYTHON_ENV}/bin/activate
-                   pip install -r requirments.txt
+                bat '''
+                   python -m venv %PYTHON_ENV%
+                   call %PYTHON_ENV%\\Scripts\\activate.bat
+                   pip install -r requirements.txt
                 '''  
             }
         }
@@ -30,20 +30,20 @@ pipeline {
         stage('Run Tests') {
             steps{
                 echo 'Running unit tests...'
-                sh'''
-                   source ${PYTHON_ENV}/bin/activate
+                bat '''
+                   call %PYTHON_ENV%\\Scripts\\activate.bat
                    pytest tests/
                 '''   
             }
         }
 
-        //Stage 4 : Deploy (this could be to a local HTTP server,for example)
+        // Stage 4 : Deploy (this could be to a local HTTP server, for example)
         stage('Deploy'){
             steps{
                 echo 'Deploying application...'
-                // In this example, we will stimute deployment by copying the code to a server directory
-                sh'''
-                   cp -r * /path/to/local/http/server/root/ # copy the app to the deployment directory
+                // In this example, we will simulate deployment by copying the code to a server directory
+                bat '''
+                   xcopy /E /I /Y * C:\\path\\to\\local\\http\\server\\root\\
                 '''
             }
         }
@@ -55,13 +55,10 @@ pipeline {
             cleanWs()                                                         // clean the workspace after the pipeline finish
         }
         success{
-            echo 'Pipeline completed succesfully!'
+            echo 'Pipeline completed successfully!'
         }
         failure{
             echo 'Pipeline failed!'
         }
     }
-
-
-
 }
