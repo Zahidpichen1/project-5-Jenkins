@@ -1,64 +1,40 @@
 pipeline {
     agent any
-
-    environment {
-        PYTHON_ENV = 'venv'        // Virtual environment for python
-    }
-
     stages {
-        // Stage 1 : Clone the repository
-        stage('checkout') {
+        stage('Checkout') {
             steps {
-                echo 'Cloning repository...'
-                git branch: 'master' , url: 'https://github.com/Zahidpichen1/project_2_devops.git'
+                // Checkout code from Git
+                git url: 'Your url' 
             }
         }
-
-        // Stage 2 : Set up the python environment
-        stage('setup Environment'){
-            steps{
-                echo 'Setting up python virtual environment...'
-                bat '''
-                   python -m venv %PYTHON_ENV%
-                   call %PYTHON_ENV%\\Scripts\\activate.bat
-                   pip install -r requirements.txt
-                '''  
+        stage('Setup Environment') {
+            steps {
+                echo "Creating virtual environment..."
+                bat 'C:\\Users\\Windows\\AppData\\Local\\Programs\\Python\\Python312\\python.exe -m venv venv'  // Use double backslashes
+                echo "Activating virtual environment..."
+                bat 'call venv\\Scripts\\activate.bat'  // This line is fine as is
+                echo "Installing dependencies..."
+                bat 'C:\\Users\\Windows\\AppData\\Local\\Programs\\Python\\Python312\\Scripts\\pip.exe install -r requirements.txt'  // Use double backslashes
             }
         }
-
-        // Stage 3 : Run unit tests
         stage('Run Tests') {
-            steps{
-                echo 'Running unit tests...'
-                bat '''
-                   call %PYTHON_ENV%\\Scripts\\activate.bat
-                   pytest tests/
-                '''   
+            steps {
+                echo "Running tests..."
+                // Add your testing commands here, for example:
+                // bat 'pytest'
             }
         }
-
-        // Stage 4 : Deploy (this could be to a local HTTP server, for example)
-        stage('Deploy'){
-            steps{
-                echo 'Deploying application...'
-                // In this example, we will simulate deployment by copying the code to a server directory
-                bat '''
-                   xcopy /E /I /Y * C:\\path\\to\\local\\http\\server\\root\\
-                '''
+        stage('Deploy') {
+            steps {
+                echo "Deploying application..."
+                // Add your deployment commands here
             }
         }
     }
-
-    post{
+    post {
         always {
-            echo 'Cleaning up workspace...'   
-            cleanWs()                                                         // clean the workspace after the pipeline finish
-        }
-        success{
-            echo 'Pipeline completed successfully!'
-        }
-        failure{
-            echo 'Pipeline failed!'
+            echo "Cleaning up workspace..."
+            cleanWs()
         }
     }
 }
